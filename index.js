@@ -18,8 +18,9 @@ app.get('/search', function(req, res) {
     // Aranacak kelime
     const query = req.query.q+' song';
 
-    if (req.query.id == '') {
-     res.json('error HHG')
+    if (req.query.id == ' ') {
+	    
+     	res.json('error HHG')
 	    
  	}else{
     const options = {
