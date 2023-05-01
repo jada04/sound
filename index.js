@@ -18,8 +18,10 @@ app.get('/search', function(req, res) {
     // Aranacak kelime
     const query = req.query.q+' song';
 
-    if (req.query.q!='') {
-    // Arama seçenekleri
+    if (req.query.id == '') {
+     res.json('error HHG')
+	    
+ 	}else{
     const options = {
       limit: 40,
     };
@@ -54,7 +56,7 @@ app.get('/search', function(req, res) {
     });
 	   
 
-    }
+	}
 
 
 
