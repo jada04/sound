@@ -62,6 +62,50 @@ app.get('/search', function(req, res) {
 
 
 
+app.get('/play', function(req, res) {
+
+    // Aranacak kelime
+    const id = req.query.id;
+    // YouTube video ID'si
+		const videoId = id;
+
+
+		// YTDLOptions
+		const options = {
+		  filter: 'audioonly',
+		  quality: 'highestaudio'
+		};
+
+
+
+      // Video bilgilerini al
+      ytdl.getInfo(videoId, options).then(info => {
+
+        const videoDetails = {
+            id: videoId,
+            title: info.videoDetails.title,
+            viewCount: info.videoDetails.viewCount,
+            thumbnailUrl: info.videoDetails.thumbnails[3].url,
+            videoLength : info.videoDetails.lengthSeconds,
+            audioUrl : info.formats.filter(f => f.mimeType.includes('audio'))[0].url
+          };
+
+
+          res.send(videoDetails);
+          console.log(videoDetails);
+
+
+
+			}).catch(error => {
+			  console.error(error);
+			});
+
+    
+
+
+});
+
+
 
 
 
