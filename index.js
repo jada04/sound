@@ -18,7 +18,7 @@ app.get('/search', function(req, res) {
     // Aranacak kelime
     const query = req.query.q+' song';
 
-    if (req.query.id == ' ') {
+    if (!req.query.q) {
 	    
      	res.json('error HHG')
 	    
@@ -69,6 +69,13 @@ app.get('/play', function(req, res) {
 
     // Aranacak kelime
     const id = req.query.id;
+	
+	if (!id) {
+	    
+     	res.json('error HHG')
+	    
+ 	}else{
+		
     // YouTube video ID'si
 		const videoId = id;
 
@@ -95,14 +102,14 @@ app.get('/play', function(req, res) {
 
 
           res.send(videoDetails);
-          console.log(videoDetails);
 
 
 
-			}).catch(error => {
-			  console.error(error);
-			});
-
+	}).catch(error => {
+	  console.error(error);
+	});
+	
+	}
     
 
 
