@@ -1,19 +1,17 @@
-FROM node:16-buster
+FROM node:16-bullseye
 
-# Sistem paketlerini güncelle, Python3'ü yükle, mevcut /usr/bin/python varsa sil ve yeni link oluştur
-RUN apt-get update && apt-get install -y python3 && \
-    rm -f /usr/bin/python && \
-    ln -s /usr/bin/python3 /usr/bin/python
+# Sistemi güncelle, "python-is-python3" paketini yükle.
+RUN apt-get update && apt-get install -y python-is-python3
 
 WORKDIR /app
 
-# package.json ve package-lock.json dosyalarını kopyalayın
+# package.json ve package-lock.json dosyalarını kopyala
 COPY package*.json ./
 
-# Bağımlılıkları yükleyin (npm ci, package-lock.json ile uyumlu şekilde kurar)
+# Bağımlılıkları yükle
 RUN npm ci
 
-# Projedeki diğer dosyaları kopyalayın
+# Tüm projeyi kopyala
 COPY . .
 
 CMD ["node", "index.js"]
