@@ -1,7 +1,7 @@
 const express = require('express');
 const ytSearch = require('yt-search');
 const cors = require('cors');
-const ytdlp = require('yt-dlp-exec');
+const ytdl = require('youtube-dl-exec');
 
 
 
@@ -41,48 +41,44 @@ app.get('/search', async (req, res) => {
 
 
 
-
-
 app.get('/play', async (req, res) => {
   let url = req.query.url || '';
 
   if (!url) {
-    return res.status(400).json({ error: 'url required' });
+    return res.status(400).json({ error: 'URL gerekli' });
   }
 
-  // Eğer URL 'http' ile başlamıyorsa, video ID olarak kabul edip URL'ye dönüştürüyoruz.
+  // Eğer URL 'http' ile başlamıyorsa, video ID olarak kabul edip tam URL'ye dönüştürüyoruz.
   if (!url.startsWith('http')) {
     url = `https://www.youtube.com/watch?v=${url}`;
   }
 
   try {
-    const output = await ytdlp(url, {
+    const output = await ytdl(url, {
       dumpJson: true,
       format: 'bestaudio',
       skipDownload: true,
     });
-    // Dönen JSON verisindeki bilgileri doğrudan döndürüyoruz.
+
+    // Dönüşte output içindeki tüm verileri döndürmek isterseniz:
     res.json({
       title: output.title,
       audioUrl: output.url,
       thumbnailUrl: output.thumbnail,
-      duration: output.duration, // duration genelde saniye cinsinden olabilir, istersen dönüştürebilirsin
+      duration: output.duration, // Süre, genellikle "PT2M22S" formatında gelebilir.
+      // İsterseniz, tüm output'u döndürmek için: ...output
     });
   } catch (error) {
-    console.error('yt-dlp-exec ile hata:', error);
-    res.status(500).json({ error: 'Video bilgisi alınamadı.', details: error.message });
+    console.error('youtube-dl-exec ile hata:', error);
+    res.status(500).json({ error: 'Video bilgisi alınamadı', details: error.message });
   }
 });
+
 
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
-
-
-
 
 
 
