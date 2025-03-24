@@ -1,6 +1,7 @@
 const express = require('express');
 const ytSearch = require('yt-search');
 const cors = require('cors');
+const ytdlp = require('yt-dlp-exec');
 
 
 
@@ -20,10 +21,10 @@ app.get('/search', async (req, res) => {
   try {
     // YouTube'da arama yapılıyor
     const results = await ytSearch(searchTerm);
+
     
     // İlk 10 video bilgisi alınıyor (başlık, URL, thumbnail, süre)
     const videoDetails = results.videos.slice(0, 10).map(video => ({
-      id: video.videoId,
       title: video.title,
       url: video.url,
       thumbnail: video.thumbnail,
@@ -42,7 +43,46 @@ app.get('/search', async (req, res) => {
 
 
 
+app.get('/play', async (req, res) => {
+  let url = req.query.url || '';
+
+  if (!url) {
+    return res.status(400).json({ error: 'url required' });
+  }
+
+  // Eğer URL 'http' ile başlamıyorsa, video ID olarak kabul edip URL'ye dönüştürüyoruz.
+  if (!url.startsWith('http')) {
+    url = `https://www.youtube.com/watch?v=${url}`;
+  }
+
+  try {
+    const output = await ytdlp(url, {
+      dumpJson: true,
+      format: 'bestaudio',
+      skipDownload: true,
+    });
+    // Dönen JSON verisindeki bilgileri doğrudan döndürüyoruz.
+    res.json({
+      title: output.title,
+      audioUrl: output.url,
+      thumbnailUrl: output.thumbnail,
+      duration: output.duration, // duration genelde saniye cinsinden olabilir, istersen dönüştürebilirsin
+    });
+  } catch (error) {
+    console.error('yt-dlp-exec ile hata:', error);
+    res.status(500).json({ error: 'Video bilgisi alınamadı.', details: error.message });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+
+
+
+
+
+
+
