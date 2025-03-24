@@ -1,7 +1,7 @@
 const express = require('express');
 const ytSearch = require('yt-search');
 const playdl = require('play-dl');
-const youtubedl = require('youtube-dl-exec');
+
 
 
 const app = express();
@@ -37,45 +37,6 @@ app.get('/search', async (req, res) => {
 
 
 
-
-
-
-// Play Endpoint (youtube-dl-exec)
-app.get('/play', async (req, res) => {
-  const videoUrl = req.query.url;
-
-  if (!videoUrl) {
-    return res.status(400).json({ error: 'url required' });
-  }
-
-  try {
-    const output = await youtubedl(videoUrl, {
-      dumpSingleJson: true,
-      format: 'bestaudio',
-      noCheckCertificates: true,
-      noWarnings: true,
-      preferFreeFormats: true,
-      addHeader: ['referer:youtube.com', 'user-agent:googlebot'],
-    });
-
-    const audioUrl = output.url;
-    const thumbnailUrl = output.thumbnail;
-    const title = output.title;
-    const durationSeconds = output.duration;
-    const durationMinutes = (durationSeconds / 60).toFixed(2);
-
-    res.json({
-      title,
-      audioUrl,
-      thumbnailUrl,
-      duration: durationMinutes
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Video info fetch error', details: err.message });
-  }
-});
 
 
 
