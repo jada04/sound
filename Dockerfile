@@ -1,9 +1,9 @@
-# Node.js 16 tabanlı bir imaj kullanıyoruz (buster sürümü Python yüklemek için uygundur)
+# Node.js 16 tabanlı bir imaj kullanıyoruz (buster sürümü, Python yüklemek için uygundur)
 FROM node:16-buster
 
-# Sistem paketlerini güncelle ve Python3'ü yükle
+# Sistem paketlerini güncelle ve Python3'ü yükle, ardından python -> python3 linki oluştur
 RUN apt-get update && apt-get install -y python3 && \
-    ln -s /usr/bin/python3 /usr/bin/python
+    ln -sf /usr/bin/python3 /usr/bin/python
 
 # Çalışma dizinini belirleyin
 WORKDIR /app
@@ -17,5 +17,5 @@ RUN npm ci
 # Projedeki diğer dosyaları kopyalayın
 COPY . .
 
-# Uygulamayı çalıştırın (örneğin, index.js dosyasını çalıştırın)
+# Uygulamayı çalıştırın (örneğin, index.js dosyası)
 CMD ["node", "index.js"]
