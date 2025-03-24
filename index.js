@@ -1,7 +1,5 @@
 const express = require('express');
 const ytSearch = require('yt-search');
-const playdl = require('play-dl');
-
 
 
 const app = express();
