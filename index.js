@@ -1,6 +1,6 @@
 const express = require('express');
 const ytSearch = require('yt-search');
-// const youtubedl = require('youtube-dl-exec');
+const playdl = require('play-dl');
 
 
 const app = express();
@@ -37,48 +37,34 @@ app.get('/search', async (req, res) => {
 
 
 
-// app.get('/play', async (req, res) => {
-//   const url = req.query.url;
-
-//   if (!url) {
-//     return res.status(400).json({ error: 'url query parameter is required' });
-//   }
-
-//   try {
-//     const output = await youtubedl(url, {
-//       dumpJson: true,
-//       format: 'bestaudio',
-//       skipDownload: true
-//     });
-
-//     const audioUrl = output.url || null;
-//     const thumbnailUrl = output.thumbnail || null;
-//     const title = output.title || null;
-//     const durationSeconds = output.duration || 0;
-//     const durationMinutes = (durationSeconds / 60).toFixed(2);
-
-//     res.json({
-//       title,
-//       audioUrl,
-//       thumbnailUrl,
-//       duration: durationMinutes
-//     });
-
-//     // İstersen konsola da yazdırmaya devam edebilirsin:
-//     console.log({
-//       title,
-//       audioUrl,
-//       thumbnailUrl,
-//       duration: durationMinutes
-//     });
-
-//   } catch (err) {
-//     console.error('Video bilgisi alınırken hata oluştu:', err);
-//     res.status(500).json({ error: 'Video bilgisi alınamadı.' });
-//   }
-// });
 
 
+app.get('/play', async (req, res) => {
+  let url = req.query.url || '';
+  
+  if (!url) {
+    return res.status(400).json({ error: 'url required' });
+  }
+
+  if (!url.startsWith('http')) {
+    url = `https://www.youtube.com/watch?v=${url}`;
+  }
+
+  try {
+    const info = await playdl.video_basic_info(url);
+    const stream = await playdl.stream(url, { quality: 2 }); // Audio only
+
+    res.json({
+      title: info.video_details.title,
+      audioUrl: stream.url,
+      thumbnailUrl: info.video_details.thumbnails[0].url,
+      duration: (info.video_details.durationInSec / 60).toFixed(2),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Video bilgisi alınamadı.', details: error.message });
+  }
+});
 
 
 
