@@ -64,9 +64,7 @@ app.get('/play', async (req, res) => {
     res.json({
       title: output.title,
       audioUrl: output.url,
-      thumbnailUrl: output.thumbnail,
-      duration: output.duration, // Süre, genellikle "PT2M22S" formatında gelebilir.
-      // İsterseniz, tüm output'u döndürmek için: ...output
+     
     });
   } catch (error) {
     console.error('youtube-dl-exec ile hata:', error);
