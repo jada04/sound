@@ -23,6 +23,7 @@ app.get('/search', async (req, res) => {
     
     // İlk 10 video bilgisi alınıyor (başlık, URL, thumbnail, süre)
     const videoDetails = results.videos.slice(0, 10).map(video => ({
+      id: video.videoId,
       title: video.title,
       url: video.url,
       thumbnail: video.thumbnail,
