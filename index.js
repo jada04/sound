@@ -1,135 +1,87 @@
 const express = require('express');
-const ytsr = require('ytsr');
-const ytdl = require('ytdl-core');
-const iconv = require('iconv-lite');
-const bodyParser = require('body-parser');
+const ytSearch = require('yt-search');
+const youtubedl = require('youtube-dl-exec');
 
 
 const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+const PORT = process.env.PORT || 3000;
 
 
 
-
-app.get('/search', function(req, res) {
-
-    // Aranacak kelime
-    const query = req.query.q+' song';
-
-    if (!req.query.q) {
-	    
-     	res.json('error HHG')
-	    
- 	}else{
-    const options = {
-      limit: 40,
-    };
-		    
-    // YouTube araması yap
-    ytsr(query, options).then(results => {
-
-      const videos = results.items.filter(item => item.type === 'video' && item.duration != null   );
-
-      const videoDetails = videos.map(video => ({
-        id: video.id,
-        type: video.type,
-        title: iconv.decode(video.title.normalize('NFKD'), 'iso-8859-1'),
-        duration: video.duration,
-        views: video.views,
-        uploadedAt: video.uploadedAt,
-        author: video.author.name,
-        channelUrl: video.author.url,
-        thumbnailUrl: video.thumbnails[0].url,
-        videoUrl: video.url
-      }));
-
-
-      
-      res.json(videoDetails)
-
-      
-
-
-    }).catch(error => {
-      console.error(error);
-    });
-	   
-
-	}
-
-
-
-});
-
-
-
-app.get('/play', function(req, res) {
-
-    // Aranacak kelime
-    const id = req.query.id;
-	
-	if (!id) {
-	    
-     	res.json('error HHG')
-	    
- 	}else{
-		
-    // YouTube video ID'si
-		const videoId = id;
-
-
-		// YTDLOptions
-		const options = {
-		  filter: 'audioonly',
-		  quality: 'highestaudio'
-		};
-
-
-
-      // Video bilgilerini al
-      ytdl.getInfo(videoId, options).then(info => {
-
-        const videoDetails = {
-            id: videoId,
-            title: info.videoDetails.title,
-            viewCount: info.videoDetails.viewCount,
-            thumbnailUrl: info.videoDetails.thumbnails[3].url,
-            videoLength : info.videoDetails.lengthSeconds,
-            audioUrl : info.formats.filter(f => f.mimeType.includes('audio'))[0].url
-          };
-
-
-          res.send(videoDetails);
-
-
-
-	}).catch(error => {
-	  console.error(error);
-	});
-	
-	}
+app.get('/search', async (req, res) => {
+  const searchTerm = req.query.search;
+  
+  if (!searchTerm) {
+    return res.status(400).json({ error: 'search query parameter is required' });
+  }
+  
+  try {
+    // YouTube'da arama yapılıyor
+    const results = await ytSearch(searchTerm);
     
+    // İlk 10 video bilgisi alınıyor (başlık, URL, thumbnail, süre)
+    const videoDetails = results.videos.slice(0, 10).map(video => ({
+      title: video.title,
+      url: video.url,
+      thumbnail: video.thumbnail,
+      duration: video.duration // örn: "3:45"
+    }));
+    
+    res.json(videoDetails);
+  } catch (error) {
+    console.error('Error during YouTube search:', error);
+    res.status(500).json({ error: 'An error occurred while searching YouTube' });
+  }
+});
 
 
+
+
+app.get('/play', async (req, res) => {
+  const url = req.query.url;
+
+  if (!url) {
+    return res.status(400).json({ error: 'url query parameter is required' });
+  }
+
+  try {
+    const output = await youtubedl(url, {
+      dumpJson: true,
+      format: 'bestaudio',
+      skipDownload: true
+    });
+
+    const audioUrl = output.url || null;
+    const thumbnailUrl = output.thumbnail || null;
+    const title = output.title || null;
+    const durationSeconds = output.duration || 0;
+    const durationMinutes = (durationSeconds / 60).toFixed(2);
+
+    res.json({
+      title,
+      audioUrl,
+      thumbnailUrl,
+      duration: durationMinutes
+    });
+
+    // İstersen konsola da yazdırmaya devam edebilirsin:
+    console.log({
+      title,
+      audioUrl,
+      thumbnailUrl,
+      duration: durationMinutes
+    });
+
+  } catch (err) {
+    console.error('Video bilgisi alınırken hata oluştu:', err);
+    res.status(500).json({ error: 'Video bilgisi alınamadı.' });
+  }
 });
 
 
 
 
 
-// Bir GET isteği için route tanımlayın
-app.get('/', function(req, res) {
-	res.json('Error');
-});
-
-
-
-
-
-
-// Sunucuyu belirtilen port numarasında başlatın
-app.listen(3000, function() {
-  console.log('Sunucu 3000 portunda çalışıyor...');
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
