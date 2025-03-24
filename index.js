@@ -58,13 +58,17 @@ app.get('/play', async (req, res) => {
       dumpJson: true,
       format: 'bestaudio',
       skipDownload: true,
+      addHeader: [
+        'referer: https://www.youtube.com/',
+        'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
+      ]
     });
 
     // Dönüşte output içindeki tüm verileri döndürmek isterseniz:
     res.json({
       title: output.title,
       audioUrl: output.url,
-     
+      
     });
   } catch (error) {
     console.error('youtube-dl-exec ile hata:', error);
