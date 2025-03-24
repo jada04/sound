@@ -1,6 +1,6 @@
 const express = require('express');
 const ytSearch = require('yt-search');
-const youtubedl = require('youtube-dl-exec');
+// const youtubedl = require('youtube-dl-exec');
 
 
 const app = express();
@@ -37,46 +37,46 @@ app.get('/search', async (req, res) => {
 
 
 
-app.get('/play', async (req, res) => {
-  const url = req.query.url;
+// app.get('/play', async (req, res) => {
+//   const url = req.query.url;
 
-  if (!url) {
-    return res.status(400).json({ error: 'url query parameter is required' });
-  }
+//   if (!url) {
+//     return res.status(400).json({ error: 'url query parameter is required' });
+//   }
 
-  try {
-    const output = await youtubedl(url, {
-      dumpJson: true,
-      format: 'bestaudio',
-      skipDownload: true
-    });
+//   try {
+//     const output = await youtubedl(url, {
+//       dumpJson: true,
+//       format: 'bestaudio',
+//       skipDownload: true
+//     });
 
-    const audioUrl = output.url || null;
-    const thumbnailUrl = output.thumbnail || null;
-    const title = output.title || null;
-    const durationSeconds = output.duration || 0;
-    const durationMinutes = (durationSeconds / 60).toFixed(2);
+//     const audioUrl = output.url || null;
+//     const thumbnailUrl = output.thumbnail || null;
+//     const title = output.title || null;
+//     const durationSeconds = output.duration || 0;
+//     const durationMinutes = (durationSeconds / 60).toFixed(2);
 
-    res.json({
-      title,
-      audioUrl,
-      thumbnailUrl,
-      duration: durationMinutes
-    });
+//     res.json({
+//       title,
+//       audioUrl,
+//       thumbnailUrl,
+//       duration: durationMinutes
+//     });
 
-    // İstersen konsola da yazdırmaya devam edebilirsin:
-    console.log({
-      title,
-      audioUrl,
-      thumbnailUrl,
-      duration: durationMinutes
-    });
+//     // İstersen konsola da yazdırmaya devam edebilirsin:
+//     console.log({
+//       title,
+//       audioUrl,
+//       thumbnailUrl,
+//       duration: durationMinutes
+//     });
 
-  } catch (err) {
-    console.error('Video bilgisi alınırken hata oluştu:', err);
-    res.status(500).json({ error: 'Video bilgisi alınamadı.' });
-  }
-});
+//   } catch (err) {
+//     console.error('Video bilgisi alınırken hata oluştu:', err);
+//     res.status(500).json({ error: 'Video bilgisi alınamadı.' });
+//   }
+// });
 
 
 
