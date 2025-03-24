@@ -1,20 +1,21 @@
 # Node.js 16 tabanlı bir imaj kullanıyoruz (buster, Python kurulumu için uygundur)
 FROM node:16-buster
 
-# Sistem paketlerini güncelle ve Python3'ü yükle (sembolik link oluşturmuyoruz)
-RUN apt-get update && apt-get install -y python3
+# Sistem paketlerini güncelle, Python3'ü yükle ve /usr/bin/python kontrolü yaparak link oluştur
+RUN apt-get update && apt-get install -y python3 && \
+    if [ ! -f /usr/bin/python ]; then ln -s /usr/bin/python3 /usr/bin/python; fi
 
-# Çalışma dizinini belirleyin
+# Çalışma dizinini ayarla
 WORKDIR /app
 
-# package.json ve package-lock.json dosyalarını kopyalayın
+# package.json ve package-lock.json dosyalarını kopyala
 COPY package*.json ./
 
-# Bağımlılıkları yükleyin
+# Bağımlılıkları yükle
 RUN npm ci
 
-# Projedeki diğer dosyaları kopyalayın
+# Projedeki diğer dosyaları kopyala
 COPY . .
 
-# Uygulamayı başlatın (örneğin, index.js dosyası)
+# Uygulamayı başlat
 CMD ["node", "index.js"]
