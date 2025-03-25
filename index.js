@@ -61,7 +61,8 @@ app.get('/play', async (req, res) => {
       addHeader: [
         'referer: https://www.youtube.com/',
         'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36',
-        'Accept: */*'
+        'Accept: */*',
+        'origin: https://www.youtube.com'
       ],
       // Cookie dosyanızın yolunu belirtin; bu dosyanın Docker imajınıza dahil edildiğinden emin olun.
       cookies: 'cookies.txt'
